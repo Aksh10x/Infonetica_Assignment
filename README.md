@@ -72,4 +72,4 @@ A minimal .NET 8 Web API for defining and executing workflow state machines en
 * **Unit & integration tests** (e.g., xUnit, FluentAssertions).
 * **Improved error-handling middleware**.
 * **Pagination & filtering** on list endpoints.
-* **Modular Code Structure:** Currently, most logic resides in Program.cs. In the future, consider organizing code into separate files (e.g., Services, Controllers, Utils) to improve maintainability and readability.
+* **Modular Code Structure**: Currently, most logic resides in Program.cs. In the future, consider organizing code into separate files (e.g., Services, Controllers, Utils) to improve maintainability and readability.
