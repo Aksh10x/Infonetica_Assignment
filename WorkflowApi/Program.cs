@@ -32,7 +32,33 @@ app.MapPost("/defs", (WorkflowDef wf) =>
     // only one initial state allowed
     if (wf.States.Count(s => s.IsInitial) !=1)
         return Results.BadRequest("Exactly one state must be marked IsInitial.");
-    // TODO: validate that every ActionDef.FromStates and ToState exists in wf.States
+
+    // check for duplicate state ids
+    var stateIds = wf.States.Select(s => s.Id).ToList();
+    if (stateIds.Count != stateIds.Distinct().Count())
+        return Results.BadRequest("State IDs must be unique.");
+
+    // check for duplicate action ids
+    var actionIds = wf.Actions.Select(a => a.Id).ToList();
+    if (actionIds.Count != actionIds.Distinct().Count())
+        return Results.BadRequest("Action IDs must be unique.");
+
+    // validate each action and ensure it references existing states
+    foreach (var act in wf.Actions)
+    {
+        // ToState must be defined
+        if (!stateIds.Contains(act.ToState))
+            return Results.BadRequest(
+                $"Action '{act.Id}' has unknown ToState '{act.ToState}'."
+            );
+
+        // FromStates must all be defined
+        var invalidFrom = act.FromStates.Except(stateIds).ToList();
+        if (invalidFrom.Any())
+            return Results.BadRequest(
+                $"Action '{act.Id}' has invalid FromStates: {string.Join(", ", invalidFrom)}."
+            );
+    }
 
     // add new definition to store
     defs[wf.Id] = wf;
