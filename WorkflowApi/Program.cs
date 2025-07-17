@@ -77,6 +77,20 @@ app.MapGet("/defs/{id}", (string id) =>
         : Results.NotFound($"Definition '{id}' not found.")
 );
 
+// ENDPOINT: list all states of a definition [GET /defs/{id}/states]
+app.MapGet("/defs/{id}/states", (string id) =>
+    defs.TryGetValue(id, out var wf)
+        ? Results.Ok(wf.States)
+        : Results.NotFound($"Definition '{id}' not found.")
+);
+
+// ENDPOINT: list all actions of a definition [GET /defs/{id}/actions]
+app.MapGet("/defs/{id}/actions", (string id) =>
+    defs.TryGetValue(id, out var wf)
+        ? Results.Ok(wf.Actions)
+        : Results.NotFound($"Definition '{id}' not found.")
+);
+
 
 // ENDPOINT: start new workflow instance [POST /insts?defId={defId}]
 app.MapPost("/insts", (string defId) =>
@@ -113,9 +127,14 @@ app.MapPost("/insts/{id}/actions/{actionId}", (string id, string actionId) =>
     if (!insts.TryGetValue(id, out var inst))
         return Results.NotFound($"Instance '{id}' not found.");
 
+    // check if instance is in a final state
+    var curDef = defs[inst.DefId];
+    var curState = curDef.States.Single(s => s.Id == inst.CurrentState);
+    if (curState.IsFinal)
+        return Results.BadRequest("Instance is in a final state and cannot be progressed.");
+
     // lookup the definition and action
-    var def = defs[inst.DefId];
-    var act = def.Actions.SingleOrDefault(a => a.Id == actionId);
+    var act = curDef.Actions.SingleOrDefault(a => a.Id == actionId);
     if (act is null || !act.Enabled)
         return Results.BadRequest($"Action '{actionId}' is invalid or disabled.");
     if (!act.FromStates.Contains(inst.CurrentState))
@@ -136,6 +155,14 @@ app.MapPost("/insts/{id}/actions/{actionId}", (string id, string actionId) =>
     // return the updated instance
     return Results.Ok(updatedInst);
 });
+
+// ENDPOINT: fetch a single workflow instance by id [GET /insts/{id}]
+app.MapGet("/insts/{id}", (string id) =>
+    insts.TryGetValue(id, out var inst)
+        ? Results.Ok(inst)
+        : Results.NotFound($"Instance '{id}' not found.")
+);
+
 
 
 app.UseHttpsRedirection();
