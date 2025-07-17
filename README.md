@@ -8,7 +8,8 @@ A minimal .NET 8 Web API for defining and executing workflow state machines en
 ## Quick‑start
 
 1. **Clone the repo**
-   ```bash
+
+    ```bash
    git clone https://github.com/Aksh10x/Infonetica_Assignment.git
    cd Infonetica_Assignment
    ```
@@ -65,6 +66,7 @@ A minimal .NET 8 Web API for defining and executing workflow state machines en
 ---
 
 ## Next Steps
+
 * **Persistence**: Swap in EF Core or another data store for durability.
 * **Authentication/Authorization** with JWT or OAuth.
 * **Unit & integration tests** (e.g., xUnit, FluentAssertions).
