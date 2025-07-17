@@ -4,29 +4,29 @@ using System.Collections.Generic;
 namespace WorkflowApi.Models
 {
     public record State(
-        string id,
-        bool isInitial,
-        bool isFinal,
-        bool enabled
+        string Id,
+        bool IsInitial,
+        bool IsFinal,
+        bool Enabled
     );
 
     public record ActionDef(
-        string id,
-        bool enabled,
-        List<string> fromStates,
-        string toState
+        string Id,
+        bool Enabled,
+        List<string> FromStates,
+        string ToState
     );
 
     public record WorkflowDef(
-        string id,
+        string Id,
         List<State> States,
         List<ActionDef> Actions
     );
 
     public record WorkflowInst(
-        string id,
-        string defId,
-        string currentState,
+        string Id,
+        string DefId,
+        string CurrentState,
         List<(string ActionId, DateTime Timestamp)> History
     );
 }
